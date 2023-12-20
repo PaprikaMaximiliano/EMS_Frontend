@@ -1,5 +1,19 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+## Overview solution
+Basic algorithm for recommending similar: recommend events that are in the same location or have same category.
+
+Added toast messages so that user will know about results of certain actions.
+
+Token is stored in cookies. isAuth( is user authorized) stored in redux store, so after reloading page user will need to login again. 
+I didn't have that much expirience with authorization, so my solution isn't secure. I would try to use refresh/access token, but I had limited time for test task.
+
+Optional Map View wasn't implemented, because of lack of time.
+
+Every feature is blocked until user login. Used HOC for making private routes. Also made axiosInterceptor so that request will automatically get Authorization Header.
+
+Form validation was implemented with react-hook-form.
+
 ## Getting Started
 
 First, run the development server:
