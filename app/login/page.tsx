@@ -9,11 +9,11 @@ import Grid from "@mui/material/Grid";
 import axios from "axios";
 import { useCookies } from "next-client-cookies";
 import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
-import { logIn } from "@/lib/features/auth-slice";
+import { logIn, setCurrentLocation } from "@/lib/features/auth-slice";
 import { useAppDispatch } from "@/lib/hooks";
+import customToast from "@/toast/toast";
 
 const LoginForm = () => {
   const {
@@ -22,21 +22,61 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm();
 
+  function getCurrentLocation() {
+    return new Promise((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const pos = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude,
+              };
+              resolve(pos);
+            },
+            (error) => {
+              handleLocationError(true);
+              reject(error);
+            }
+        );
+      } else {
+        handleLocationError(false);
+        reject("Geolocation is not supported by this browser.");
+      }
+    });
+  }
+
+  function handleLocationError(
+      browserHasGeolocation: boolean,
+  ) {
+    alert(
+        browserHasGeolocation
+            ? "Error: The Geolocation service failed."
+            : "Error: Your browser doesn't support geolocation."
+    );
+  }
+
   const cookies = useCookies();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
   const onSubmit = async (data: any) => {
-    let response = await axios.post("http://localhost:5000/auth/login", data, {
+    axios.post("http://localhost:5000/auth/login", data, {
       headers: {
         "Content-Type": "application/json",
       },
-    });
-    if (response.status !== 201) return;
-    router.push("/event");
-    const { token } = response.data;
-    cookies.set("JWT", token);
-    dispatch(logIn());
+    }).then((response) => {
+      router.push("/event");
+      const { token } = response.data;
+      cookies.set("JWT", token);
+      dispatch(logIn());
+      getCurrentLocation()
+          .then((pos) => {
+            dispatch(setCurrentLocation(pos))
+          })
+    }).catch((e) => {
+      customToast("error", e.response.data.message);
+    })
+
   };
 
   const errorUsername = errors.email?.message;

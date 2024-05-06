@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v13-appRouter";
 import StoreProvider from "@/app/StoreProvider";
@@ -16,18 +15,20 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // @eslint-disable
+  // @ts-ignore
   return (
     <html lang="en">
-      <body>
-        <CookiesProvider>
-          <StoreProvider>
-            <AppRouterCacheProvider>
-              {children}
-              <Toaster position="top-left" />
-            </AppRouterCacheProvider>
-          </StoreProvider>
-        </CookiesProvider>
-      </body>
+    <body>
+    <CookiesProvider>
+      <StoreProvider>
+        <AppRouterCacheProvider>
+          {children}
+          <Toaster position="top-left"/>
+        </AppRouterCacheProvider>
+      </StoreProvider>
+    </CookiesProvider>
+    </body>
     </html>
   );
 }

@@ -26,7 +26,7 @@ const EventItem = ({
   isSingleEvent,
   handleDelete,
 }: Props) => {
-  const { id, title, description, category, date, location } = event;
+  const { id, title, description, category, date } = event;
 
   let formattedDate = new Date(date).toUTCString();
 
@@ -57,9 +57,6 @@ const EventItem = ({
         <Typography color="textSecondary">
           Date: <span style={{ color: "black" }}>{`${formattedDate}`}</span>
         </Typography>
-        <Typography color="textSecondary">
-          Location: <span style={{ color: "black" }}>{location}</span>
-        </Typography>
         <Typography color="textSecondary" variant="body2" component="p">
           Description:
           <span style={{ color: "black" }}>{description}</span>
@@ -69,6 +66,16 @@ const EventItem = ({
           <span style={{ color: "black" }}>{category}</span>
         </Typography>
         <div style={{ marginTop: "auto" }}>
+          {isSingleEvent && (
+              <Button
+                  component={Link}
+                  href={`/event/${id}/location`}
+                  variant="contained"
+                  color="primary"
+              >
+                View location
+              </Button>
+          )}
           {!isSingleEvent && (
             <Button
               component={Link}

@@ -1,15 +1,14 @@
 "use client";
 import React from "react";
-import Link from "next/link";
 import Navigation from "@/components/Navigation";
 import { Button } from "@mui/material";
 import { logOut } from "@/lib/features/auth-slice";
 import { useAppDispatch } from "@/lib/hooks";
-import { redirect } from "next/navigation";
 
 const navItems = [
   { label: "Events", href: "/event" },
   { label: "My Events", href: "/event/my" },
+  { label: "Events location", href: "/map" },
 ];
 
 const TheHeader = () => {

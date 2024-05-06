@@ -35,26 +35,28 @@ const EditEventPage = ({ params: { id } }: Props) => {
     return <div>Oops, this event do not exist.</div>;
   }
 
-  const handleEventAction = async (data: any, selectedDate: Date) => {
+  const handleEventAction = async (data: any, selectedDate: Date,  selectedLocation: any) => {
     let formattedDateToISO8601 = selectedDate.toISOString();
-    const response = await axiosInterceptor.put(`/events/${id}`, {
+    axiosInterceptor.put(`/events/${id}`, {
       ...data,
       date: formattedDateToISO8601,
-    });
-    if (response.status === 200) {
+      lat: selectedLocation.lat(),
+      lng: selectedLocation.lng()
+    }).then(() => {
       customToast("success", "Event was successfully updated.");
-    } else {
+    }).catch(() => {
       customToast("error", "Oops, something went wrong");
-    }
+    })
+
   };
 
   return (
-    <div>
+    <div style={{flex: "1 1 auto", display: "flex", flexDirection: "column"}}>
       <h1>Edit Event</h1>
       <CreateEventForm
-        handleEventAction={handleEventAction}
-        actionTitle="Edit"
-        event={event}
+          handleEventAction={handleEventAction}
+          actionTitle="Edit"
+          event={event}
       />
     </div>
   );

@@ -1,10 +1,11 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
 type InititalState = {
   isAuth: boolean;
   username: string;
   uid: string;
   isModerator: boolean;
+  currentLocation: any;
 };
 
 const initialState = {
@@ -12,6 +13,7 @@ const initialState = {
   username: "",
   uid: "",
   isModerator: false,
+  currentLocation: null
 } as InititalState;
 
 export const auth = createSlice({
@@ -24,8 +26,11 @@ export const auth = createSlice({
     logIn: (state) => {
       state.isAuth = true;
     },
+    setCurrentLocation: (state, action) => {
+      state.currentLocation = action.payload;
+    }
   },
 });
 
-export const { logIn, logOut } = auth.actions;
+export const { logIn, logOut, setCurrentLocation } = auth.actions;
 export default auth.reducer;

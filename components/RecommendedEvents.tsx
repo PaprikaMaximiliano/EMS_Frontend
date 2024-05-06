@@ -3,6 +3,7 @@ import { Event } from "@/types/Event";
 import axiosInterceptor from "@/interceptors/axiosInterceptor";
 import { Grid } from "@mui/material";
 import EventItem from "@/components/EventItem";
+import {useAppSelector} from "@/lib/hooks";
 
 type Props = {
   id: string;
@@ -11,6 +12,7 @@ type Props = {
 export function RecommendedEvents({ id }: Props) {
   const [recommendedEvents, setRecommendedEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const currentLocation = useAppSelector(state => state.authReducer.currentLocation);
 
   useEffect(() => {
     fetchRecommended()
@@ -20,7 +22,7 @@ export function RecommendedEvents({ id }: Props) {
 
   const fetchRecommended = async () => {
     setIsLoading(true);
-    return await axiosInterceptor.get(`/events/recommended?id=${id}`);
+    return await axiosInterceptor.get(`/events/recommended?id=${id}&lat=${currentLocation.lat}&lng=${currentLocation.lng}`);
   };
 
   if (isLoading) {

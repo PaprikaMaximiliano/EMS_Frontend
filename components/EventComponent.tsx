@@ -12,7 +12,6 @@ type Props = {
 export default function EventComponent({ id, isSingleEvent = false }: Props) {
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   useEffect(() => {
     fetchEvent()
       .then((events) => setEvent(events.data))

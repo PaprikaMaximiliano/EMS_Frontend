@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import withAuth from "@/hocs/withAuth";
 import EventComponent from "@/components/EventComponent";
 import { RecommendedEvents } from "@/components/RecommendedEvents";

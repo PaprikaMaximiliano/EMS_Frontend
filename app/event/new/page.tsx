@@ -5,27 +5,31 @@ import customToast from "@/toast/toast";
 import withAuth from "@/hocs/withAuth";
 
 const CreateEventPage = () => {
-  const handleEventAction = async (data: any, selectedDate: Date) => {
+  const handleEventAction = async (data: any, selectedDate: Date, selectedLocation: any) => {
     let formattedDateToISO8601 = selectedDate.toISOString();
 
-    const response = await axiosInterceptor.post("/events", {
+    axiosInterceptor.post("/events", {
       ...data,
       date: formattedDateToISO8601,
-    });
-    if (response.status === 201) {
-      customToast("success", "Event was successfully created.");
-    } else {
+      lat: selectedLocation.lat(),
+      lng: selectedLocation.lng()
+    }).then(() => {
+        customToast("success", "Event was successfully created.");
+    }).catch((_e) => {
       customToast("error", "Oops, something went wrong");
-    }
+
+    })
+
   };
 
   return (
-    <div>
+    <div style={{flex: "1 1 auto", display: "flex", flexDirection: "column"}}>
       <h1>Create Event</h1>
       <CreateEventForm
         handleEventAction={handleEventAction}
         actionTitle="Create"
       />
+
     </div>
   );
 };
