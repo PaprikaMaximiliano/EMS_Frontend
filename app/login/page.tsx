@@ -15,7 +15,9 @@ import { logIn, setCurrentLocation } from "@/lib/features/auth-slice";
 import { useAppDispatch } from "@/lib/hooks";
 import customToast from "@/toast/toast";
 import API_BASE_URL from "@/utils/apiBaseUrl";
-import getCurrentLocation from "@/utils/getCurrentLocation";
+import getCurrentLocation, {
+  FALLBACK_LOCATION,
+} from "@/utils/getCurrentLocation";
 
 const LoginForm = () => {
   const {
@@ -44,6 +46,7 @@ const LoginForm = () => {
       if (locationResult.ok) {
         dispatch(setCurrentLocation(locationResult.position));
       } else {
+        dispatch(setCurrentLocation(FALLBACK_LOCATION));
         customToast("warning", locationResult.reason);
       }
 

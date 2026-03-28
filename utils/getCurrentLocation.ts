@@ -3,15 +3,34 @@ export type CurrentLocation = {
   lng: number;
 };
 
+export const FALLBACK_LOCATION: CurrentLocation = {
+  lat: 49.3794,
+  lng: 31.1656,
+};
+
 export type CurrentLocationResult =
   | { ok: true; position: CurrentLocation }
   | { ok: false; reason: string };
 
-const GEO_OPTIONS: PositionOptions = {
+const FAST_GEO_OPTIONS: PositionOptions = {
   enableHighAccuracy: false,
-  timeout: 8000,
-  maximumAge: 60000,
+  timeout: 5000,
+  maximumAge: 120000,
 };
+
+const RETRY_GEO_OPTIONS: PositionOptions = {
+  enableHighAccuracy: true,
+  timeout: 12000,
+  maximumAge: 0,
+};
+
+function requestPosition(
+  options: PositionOptions,
+): Promise<GeolocationPosition> {
+  return new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject, options);
+  });
+}
 
 function mapLocationError(error: GeolocationPositionError): string {
   if (error.code === error.PERMISSION_DENIED) {
@@ -55,8 +74,9 @@ export default function getCurrentLocation(): Promise<CurrentLocationResult> {
       return;
     }
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
+    requestPosition(FAST_GEO_OPTIONS)
+      .catch(() => requestPosition(RETRY_GEO_OPTIONS))
+      .then((position) => {
         resolve({
           ok: true,
           position: {
@@ -64,11 +84,9 @@ export default function getCurrentLocation(): Promise<CurrentLocationResult> {
             lng: position.coords.longitude,
           },
         });
-      },
-      (error) => {
+      })
+      .catch((error: GeolocationPositionError) => {
         resolve({ ok: false, reason: mapLocationError(error) });
-      },
-      GEO_OPTIONS,
-    );
+      });
   });
 }
