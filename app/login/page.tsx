@@ -14,6 +14,7 @@ import { Link as MuiLink } from "@mui/material";
 import { logIn, setCurrentLocation } from "@/lib/features/auth-slice";
 import { useAppDispatch } from "@/lib/hooks";
 import customToast from "@/toast/toast";
+import API_BASE_URL from "@/utils/apiBaseUrl";
 
 const LoginForm = () => {
   const {
@@ -26,17 +27,17 @@ const LoginForm = () => {
     return new Promise((resolve, reject) => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-            (position) => {
-              const pos = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude,
-              };
-              resolve(pos);
-            },
-            (error) => {
-              handleLocationError(true);
-              reject(error);
-            }
+          (position) => {
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            resolve(pos);
+          },
+          (error) => {
+            handleLocationError(true);
+            reject(error);
+          },
         );
       } else {
         handleLocationError(false);
@@ -45,13 +46,11 @@ const LoginForm = () => {
     });
   }
 
-  function handleLocationError(
-      browserHasGeolocation: boolean,
-  ) {
+  function handleLocationError(browserHasGeolocation: boolean) {
     alert(
-        browserHasGeolocation
-            ? "Error: The Geolocation service failed."
-            : "Error: Your browser doesn't support geolocation."
+      browserHasGeolocation
+        ? "Error: The Geolocation service failed."
+        : "Error: Your browser doesn't support geolocation.",
     );
   }
 
@@ -60,23 +59,24 @@ const LoginForm = () => {
   const dispatch = useAppDispatch();
 
   const onSubmit = async (data: any) => {
-    axios.post("http://localhost:5000/auth/login", data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then((response) => {
-      router.push("/event");
-      const { token } = response.data;
-      cookies.set("JWT", token);
-      dispatch(logIn());
-      getCurrentLocation()
-          .then((pos) => {
-            dispatch(setCurrentLocation(pos))
-          })
-    }).catch((e) => {
-      customToast("error", e.response.data.message);
-    })
-
+    axios
+      .post(`${API_BASE_URL}/auth/login`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        router.push("/event");
+        const { token } = response.data;
+        cookies.set("JWT", token);
+        dispatch(logIn());
+        getCurrentLocation().then((pos) => {
+          dispatch(setCurrentLocation(pos));
+        });
+      })
+      .catch((e) => {
+        customToast("error", e.response.data.message);
+      });
   };
 
   const errorUsername = errors.email?.message;

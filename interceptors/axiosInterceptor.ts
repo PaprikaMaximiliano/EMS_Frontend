@@ -1,7 +1,8 @@
 import axios from "axios";
+import API_BASE_URL from "@/utils/apiBaseUrl";
 
 const axiosInterceptorInstance = axios.create({
-  baseURL: "http://localhost:5000",
+  baseURL: API_BASE_URL,
 });
 
 function getCookie(cname: string) {
@@ -31,7 +32,7 @@ axiosInterceptorInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 axiosInterceptorInstance.interceptors.response.use(
@@ -40,7 +41,7 @@ axiosInterceptorInstance.interceptors.response.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInterceptorInstance;

@@ -14,6 +14,7 @@ import Link from "next/link";
 import { Link as MuiLink } from "@mui/material";
 import { logIn } from "@/lib/features/auth-slice";
 import { useAppDispatch } from "@/lib/hooks";
+import API_BASE_URL from "@/utils/apiBaseUrl";
 
 const LoginForm = () => {
   const {
@@ -27,15 +28,11 @@ const LoginForm = () => {
   const dispatch = useAppDispatch();
 
   const onSubmit = async (data: any) => {
-    let response = await axios.post(
-      "http://localhost:5000/auth/registration",
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    let response = await axios.post(`${API_BASE_URL}/auth/registration`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
     if (response.status !== 201) return;
     router.push("/event");
     const { token } = response.data;
