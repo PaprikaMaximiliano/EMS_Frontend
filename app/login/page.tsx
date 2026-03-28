@@ -15,6 +15,7 @@ import { logIn, setCurrentLocation } from "@/lib/features/auth-slice";
 import { useAppDispatch } from "@/lib/hooks";
 import customToast from "@/toast/toast";
 import API_BASE_URL from "@/utils/apiBaseUrl";
+import getCurrentLocation from "@/utils/getCurrentLocation";
 
 const LoginForm = () => {
   const {
@@ -23,60 +24,33 @@ const LoginForm = () => {
     formState: { errors },
   } = useForm();
 
-  function getCurrentLocation() {
-    return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-            resolve(pos);
-          },
-          (error) => {
-            handleLocationError(true);
-            reject(error);
-          },
-        );
-      } else {
-        handleLocationError(false);
-        reject("Geolocation is not supported by this browser.");
-      }
-    });
-  }
-
-  function handleLocationError(browserHasGeolocation: boolean) {
-    alert(
-      browserHasGeolocation
-        ? "Error: The Geolocation service failed."
-        : "Error: Your browser doesn't support geolocation.",
-    );
-  }
-
   const cookies = useCookies();
   const router = useRouter();
   const dispatch = useAppDispatch();
 
   const onSubmit = async (data: any) => {
-    axios
-      .post(`${API_BASE_URL}/auth/login`, data, {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/auth/login`, data, {
         headers: {
           "Content-Type": "application/json",
         },
-      })
-      .then((response) => {
-        router.push("/event");
-        const { token } = response.data;
-        cookies.set("JWT", token);
-        dispatch(logIn());
-        getCurrentLocation().then((pos) => {
-          dispatch(setCurrentLocation(pos));
-        });
-      })
-      .catch((e) => {
-        customToast("error", e.response.data.message);
       });
+
+      const { token } = response.data;
+      cookies.set("JWT", token);
+      dispatch(logIn());
+
+      const locationResult = await getCurrentLocation();
+      if (locationResult.ok) {
+        dispatch(setCurrentLocation(locationResult.position));
+      } else {
+        customToast("warning", locationResult.reason);
+      }
+
+      router.push("/event");
+    } catch (e: any) {
+      customToast("error", e?.response?.data?.message || "Login failed");
+    }
   };
 
   const errorUsername = errors.email?.message;
